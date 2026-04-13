@@ -52,15 +52,25 @@
 
   animation: pillAppear 0.55s cubic-bezier(0.4, 0, 0.2, 1) both;
   transition:
-    background   0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    border-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow   0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    transform    0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    background   0.5s  cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.5s  cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow   0.5s  cubic-bezier(0.4, 0, 0.2, 1),
+    transform    0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity      0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Rétractée hors écran (scroll down) */
+/* État SCROLL DOWN — pilule hors écran */
 .nav.nav-hidden {
   transform: translateX(-50%) translateY(calc(-100% - 20px));
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* État SCROLL UP / TOP / IDLE — pilule visible */
+.nav.nav-visible {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+  pointer-events: auto;
 }
 
 /* Après scroll ou pages sans hero — verre clair */

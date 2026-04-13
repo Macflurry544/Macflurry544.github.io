@@ -77,43 +77,67 @@
   /* ── État initial ─────────────────────────────────────────────── */
   if (!hasHero) nav.classList.add('scrolled');
 
-  /* ── Scroll : opacité + rétractation intelligente ────────────── */
-  var lastScrollY  = window.scrollY;
-  var ticking      = false;
-  var HIDE_AFTER   = 80;   // px avant d'activer le masquage
-  var DELTA        = 6;    // mouvement minimal pour déclencher (anti-tremblement)
+  /* ═══════════════════════════════════════════════════════════════
+     SCROLL — 4 états déterministes : TOP / IDLE / DOWN / UP
+     Règles :
+       • scrollY = 0          → toujours visible (TOP)
+       • direction = DOWN      → cacher (sauf menu ouvert)
+       • direction = UP        → montrer
+       • inactivité ≥ 800ms   → IDLE, garder dernier état (rien changer)
+     ═══════════════════════════════════════════════════════════════ */
+
+  var lastScrollY   = window.scrollY;   // position au dernier event
+  var lastDirection = 'up';             // direction courante
+  var idleTimer     = null;             // timer inactivité
+  var ticking       = false;            // rAF gate anti-double
+
+  function showNav() {
+    nav.classList.remove('nav-hidden');
+    nav.classList.add('nav-visible');
+  }
+
+  function hideNav() {
+    nav.classList.add('nav-hidden');
+    nav.classList.remove('nav-visible');
+  }
 
   function onScroll() {
-    var currentY = window.scrollY;
-    var delta    = currentY - lastScrollY;
+    var currentY  = window.scrollY;
+    var direction = currentY > lastScrollY ? 'down' : 'up';
 
-    // Basculer fond opaque (seulement sur pages avec hero)
+    /* ── Fond opaque (pages avec hero seulement) ───────────────── */
     if (hasHero) {
       nav.classList.toggle('scrolled', currentY > 60);
     }
 
-    // Anti-flickering : ignorer micro-mouvements
-    if (Math.abs(delta) < DELTA) {
-      lastScrollY = currentY;
-      ticking = false;
+    /* ── TOP PAGE : toujours visible, priorité absolue ─────────── */
+    if (currentY === 0) {
+      showNav();
+      lastScrollY   = currentY;
+      lastDirection = direction;
+      ticking       = false;
       return;
     }
 
-    // En haut de page → toujours visible
-    if (currentY <= HIDE_AFTER) {
-      nav.classList.remove('nav-hidden');
-    } else if (delta > 0) {
-      // Scroll DOWN → cacher (sauf si menu ouvert)
-      if (!menu.classList.contains('open')) {
-        nav.classList.add('nav-hidden');
+    /* ── DIRECTION prime sur tout ───────────────────────────────── */
+    if (direction !== lastDirection || direction === 'down') {
+      if (direction === 'down' && !menu.classList.contains('open')) {
+        hideNav();
+      } else if (direction === 'up') {
+        showNav();
       }
-    } else {
-      // Scroll UP → montrer
-      nav.classList.remove('nav-hidden');
+      lastDirection = direction;
     }
 
     lastScrollY = currentY;
-    ticking = false;
+    ticking     = false;
+
+    /* ── IDLE : reset timer, ne rien faire à l'expiration ──────── */
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(function () {
+      // IDLE — la navbar reste dans son dernier état
+      // (aucune action volontaire)
+    }, 800);
   }
 
   window.addEventListener('scroll', function () {
