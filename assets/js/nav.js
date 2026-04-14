@@ -22,6 +22,7 @@
     { href: '/joseph-trouillet/',             label: 'Joseph Trouillet' },
     { href: '/presse/',                       label: 'Presse' },
     { href: '/carte/',                        label: 'Carte' },
+    { href: '/histoire/archives/',            label: 'Archives' },
     { href: '/sauvegarde-et-restauration/',   label: 'Sauvegarde' },
     { href: '/horaires-douverture/',          label: "Horaires d'ouverture" },
     { href: '/contact/',                      label: 'Contact' },
